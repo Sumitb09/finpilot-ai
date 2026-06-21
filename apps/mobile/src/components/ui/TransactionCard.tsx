@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
+import { useAppTheme } from "../../theme/useAppTheme";
+
 type Props = {
   emoji: string;
   title: string;
@@ -14,19 +16,38 @@ export default function TransactionCard({
   amount,
   income = false,
 }: Props) {
+  const { palette } = useAppTheme();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: palette.card,
+          borderColor: palette.border,
+        },
+      ]}
+    >
       <View style={styles.left}>
         <Text style={styles.emoji}>{emoji}</Text>
 
-        <Text style={styles.title}>{title}</Text>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: palette.text,
+            },
+          ]}
+        >
+          {title}
+        </Text>
       </View>
 
       <Text
         style={[
           styles.amount,
           {
-            color: income ? "#22C55E" : "#EF4444",
+            color: income ? palette.success : palette.danger,
           },
         ]}
       >
@@ -38,14 +59,17 @@ export default function TransactionCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#172554",
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 12,
-
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+
+    padding: 16,
+
+    borderRadius: 14,
+
+    borderWidth: 1,
+
+    marginBottom: 12,
   },
 
   left: {
@@ -59,7 +83,6 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "600",
   },

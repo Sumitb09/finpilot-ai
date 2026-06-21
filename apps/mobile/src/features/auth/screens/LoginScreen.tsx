@@ -18,22 +18,27 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
-    try {
+    try { 
       setLoading(true);
-
-      const { error } = await signIn(email.trim(), password);
-
-      if (error) {
-        Alert.alert("Login Failed", error.message);
-        return;
-      }
-
-      router.replace("/");
-    } finally {
-      setLoading(false);
-    }
+      const result = await signIn(email.trim(), password);
+      console.log("========== LOGIN RESULT ==========");
+      console.log(result); 
+      console.log(JSON.stringify(result, null, 2)); 
+      if (result.error) { 
+        console.log("LOGIN ERROR:", result.error);  
+        Alert.alert("Login Failed", result.error.message);  
+        return; 
+      }  
+      console.log("LOGIN SUCCESS");  
+      console.log(result.data); 
+      router.replace("/"); 
+    } catch (e) { 
+      console.log("LOGIN EXCEPTION:", e); 
+      Alert.alert("Exception", JSON.stringify(e)); 
+    } finally { 
+      setLoading(false); 
+    } 
   }
-
   return (
     <Screen>
       <Text style={styles.title}>Welcome Back 👋</Text>

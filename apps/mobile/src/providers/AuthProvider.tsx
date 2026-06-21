@@ -1,40 +1,43 @@
-import { ReactNode, useEffect } from "react";
-import { supabase } from "../lib/supabase/client";
-import { useAuthStore } from "../store/auth/authStore";
-import AuthGate from "../components/AuthGate";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
 
-type Props = {
-  children: ReactNode;
-};
+const AuthContext = createContext({
+  session: null as Session | null,
+  loading: true,
+});
 
-export default function AuthProvider({
+export function AuthProvider({
   children,
-}: Props) {
-  const setSession = useAuthStore(
-    (state) => state.setSession
-  );
+}: {
+  children: React.ReactNode;
+}) {
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
+    console.log("AuthProvider mounted");
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    setTimeout(() => {
+      console.log("Finished loading");
+      setLoading(false);
+    }, 1000);
   }, []);
 
+  if (loading) {
+    return null;
+  }
+
   return (
-    <AuthGate>
+    <AuthContext.Provider
+      value={{
+        session: null,
+        loading: false,
+      }}
+    >
       {children}
-    </AuthGate>
+    </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
 }

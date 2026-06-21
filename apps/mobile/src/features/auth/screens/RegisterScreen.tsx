@@ -17,6 +17,9 @@ export default function RegisterScreen() {
 
   async function handleRegister() {
     const { error } = await signUp(email.trim(), password);
+    const result = await signUp(email.trim(), password);
+      console.log("SIGNUP RESULT");
+      console.log(JSON.stringify(result, null, 2));
 
     if (error) {
       Alert.alert("Registration Failed", error.message);

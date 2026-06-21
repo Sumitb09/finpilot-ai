@@ -1,8 +1,26 @@
-export const Typography = {
-  title: 34,
-  heading: 28,
-  subheading: 22,
-  body: 16,
-  caption: 14,
-  small: 12,
+export const typography = {
+  h1: {
+    fontSize: 34,
+    fontWeight: "700" as const,
+  },
+
+  h2: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+  },
+
+  h3: {
+    fontSize: 22,
+    fontWeight: "600" as const,
+  },
+
+  body: {
+    fontSize: 16,
+    fontWeight: "400" as const,
+  },
+
+  caption: {
+    fontSize: 13,
+    fontWeight: "400" as const,
+  },
 };

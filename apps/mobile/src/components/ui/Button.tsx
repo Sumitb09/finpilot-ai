@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { Colors, Spacing } from "@/src/theme";
+
+import { radius } from "../../theme";
+import { useAppTheme } from "../../theme/useAppTheme";
 
 type ButtonProps = {
   title: string;
@@ -18,17 +20,33 @@ export default function Button({
   onPress,
   loading = false,
 }: ButtonProps) {
+  const { palette } = useAppTheme();
+
   return (
     <TouchableOpacity
-      style={styles.button}
       activeOpacity={0.85}
       onPress={onPress}
       disabled={loading}
+      style={[
+        styles.button,
+        {
+          backgroundColor: palette.primary,
+        },
+      ]}
     >
       {loading ? (
-        <ActivityIndicator color={Colors.white} />
+        <ActivityIndicator color={palette.text} />
       ) : (
-        <Text style={styles.text}>{title}</Text>
+        <Text
+          style={[
+            styles.text,
+            {
+              color: palette.text,
+            },
+          ]}
+        >
+          {title}
+        </Text>
       )}
     </TouchableOpacity>
   );
@@ -36,14 +54,12 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: Colors.primary,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: radius.md,
     alignItems: "center",
   },
 
   text: {
-    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },
