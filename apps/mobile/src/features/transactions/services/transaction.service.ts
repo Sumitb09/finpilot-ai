@@ -79,3 +79,39 @@ export async function deleteTransaction(id: string) {
 
   if (error) throw error;
 }
+
+export async function getTransactionById(id: string) {
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(`
+        *,
+        categories (
+          id,
+          name,
+          icon,
+          color
+        )
+      `)
+      .eq("id", id)
+      .single();
+  
+    if (error) throw error;
+  
+    return data as Transaction;
+  }
+  
+  export async function updateTransaction(
+    id: string,
+    payload: Omit<CreateTransactionInput, "user_id">
+  ) {
+    const { data, error } = await supabase
+      .from("transactions")
+      .update(payload)
+      .eq("id", id)
+      .select()
+      .single();
+  
+    if (error) throw error;
+  
+    return data;
+  }

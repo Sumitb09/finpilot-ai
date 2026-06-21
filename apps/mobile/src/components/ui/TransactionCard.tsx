@@ -1,9 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  Pressable,
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
+import { router } from "expo-router";
 
 import { useAppTheme } from "../../theme/useAppTheme";
 
 type Props = {
+  id: string;
   emoji: string;
   title: string;
   amount: string;
@@ -11,6 +18,7 @@ type Props = {
 };
 
 export default function TransactionCard({
+  id,
   emoji,
   title,
   amount,
@@ -18,18 +26,32 @@ export default function TransactionCard({
 }: Props) {
   const { palette } = useAppTheme();
 
+  function handlePress() {
+      router.push({
+        pathname: "/(protected)/edit-transaction/[id]",
+        params: { id },
+      });
+  }
+
   return (
-    <View
-      style={[
+    <Pressable
+      onPress={handlePress}
+      android_ripple={{
+        color: palette.border,
+      }}
+      style={({ pressed }) => [
         styles.container,
         {
           backgroundColor: palette.card,
           borderColor: palette.border,
+          opacity: pressed ? 0.8 : 1,
         },
       ]}
     >
       <View style={styles.left}>
-        <Text style={styles.emoji}>{emoji}</Text>
+        <Text style={styles.emoji}>
+          {emoji}
+        </Text>
 
         <Text
           style={[
@@ -38,6 +60,7 @@ export default function TransactionCard({
               color: palette.text,
             },
           ]}
+          numberOfLines={1}
         >
           {title}
         </Text>
@@ -47,13 +70,15 @@ export default function TransactionCard({
         style={[
           styles.amount,
           {
-            color: income ? palette.success : palette.danger,
+            color: income
+              ? palette.success
+              : palette.danger,
           },
         ]}
       >
         {amount}
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -75,6 +100,8 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
+    marginRight: 12,
   },
 
   emoji: {
@@ -85,6 +112,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "600",
+    flexShrink: 1,
   },
 
   amount: {

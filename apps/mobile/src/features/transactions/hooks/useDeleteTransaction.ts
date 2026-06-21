@@ -11,9 +11,13 @@ import {
     return useMutation({
       mutationFn: deleteTransaction,
   
-      onSuccess() {
+      onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["transactions"],
+        });
+  
+        queryClient.invalidateQueries({
+          queryKey: ["profile"],
         });
       },
     });

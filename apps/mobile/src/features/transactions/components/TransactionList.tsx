@@ -8,17 +8,24 @@ import {
 
 import TransactionCard from "../../../components/ui/TransactionCard";
 import { useTransactions } from "../hooks/useTransactions";
+import { Transaction } from "../types/transaction";
 
-export default function TransactionList() {
+type Props = {
+  data?: Transaction[];
+};
+
+export default function TransactionList({
+  data: externalData,
+}: Props) {
   const {
     data = [],
     isPending,
     error,
   } = useTransactions();
-  console.log("Transactions:", data);
-  console.log("Error:", error);
 
-  if (isPending) {
+  const transactions = externalData ?? data;
+
+  if (isPending && !externalData) {
     return (
       <ActivityIndicator
         size="large"
@@ -27,7 +34,7 @@ export default function TransactionList() {
     );
   }
 
-  if (error) {
+  if (error && !externalData) {
     return (
       <Text style={styles.message}>
         Failed to load transactions.
@@ -35,7 +42,7 @@ export default function TransactionList() {
     );
   }
 
-  if (data.length === 0) {
+  if (transactions.length === 0) {
     return (
       <Text style={styles.message}>
         No transactions yet.
@@ -46,10 +53,11 @@ export default function TransactionList() {
   return (
     <FlatList
       scrollEnabled={false}
-      data={data}
+      data={transactions}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TransactionCard
+          id={item.id}
           emoji={item.categories?.icon ?? "💳"}
           title={item.title}
           amount={`${item.type === "expense" ? "-" : "+"}₹${Number(

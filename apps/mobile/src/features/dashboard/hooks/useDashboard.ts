@@ -1,22 +1,36 @@
 import { useMemo } from "react";
 
 import { useTransactions } from "../../transactions/hooks/useTransactions";
+import { useProfile } from "../../settings/hooks/useProfile";
+
+import {
+  getCategoryBreakdown,
+} from "../services/dashboard.service";
+
+import {
+  getMonthlyAnalytics,
+} from "../services/analytics.service";
 
 export function useDashboard() {
   const {
     data = [],
-    ...query
+    isPending: transactionsLoading,
   } = useTransactions();
+
+  const {
+    data: profile,
+    isPending: profileLoading,
+  } = useProfile();
 
   const totals = useMemo(() => {
     let income = 0;
     let expense = 0;
 
-    data.forEach((tx) => {
-      if (tx.type === "income") {
-        income += Number(tx.amount);
+    data.forEach((transaction) => {
+      if (transaction.type === "income") {
+        income += Number(transaction.amount);
       } else {
-        expense += Number(tx.amount);
+        expense += Number(transaction.amount);
       }
     });
 
@@ -28,9 +42,28 @@ export function useDashboard() {
     };
   }, [data]);
 
+  const categories = useMemo(
+    () => getCategoryBreakdown(data),
+    [data]
+  );
+
+  const analytics = useMemo(
+    () => getMonthlyAnalytics(data),
+    [data]
+  );
+
   return {
-    totals,
     transactions: data,
-    ...query,
+
+    totals,
+
+    categories,
+
+    analytics,
+
+    profile,
+
+    isPending:
+      transactionsLoading || profileLoading,
   };
 }

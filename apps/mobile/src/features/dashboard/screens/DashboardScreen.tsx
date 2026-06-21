@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { router } from "expo-router";
 
 import Screen from "../../../components/ui/Screen";
 import Section from "../../../components/ui/Section";
-import Button from "../../../components/ui/Button";
 
 import Header from "../components/Header";
 import BalanceCard from "../components/BalanceCard";
+import BudgetProgressCard from "../components/BudgetProgressCard";
+import MonthlyChart from "../components/MonthlyChart";
+import CategoryBreakdown from "../components/CategoryBreakdown";
 import StatsSection from "../components/StatsSection";
 import QuickActions from "../components/QuickActions";
 import AIInsightCard from "../components/AIInsightCard";
@@ -14,25 +16,24 @@ import FloatingButton from "../components/FloatingButton";
 
 import TransactionList from "../../transactions/components/TransactionList";
 
-import { signOut } from "../../../services/auth/auth.service";
-import { testConnection } from "../../../services/testConnection";
-
 import { useDashboard } from "../hooks/useDashboard";
 
-
 export default function DashboardScreen() {
-  const { totals } = useDashboard();
-  useEffect(() => {
-    testConnection();
-  }, []);
-
-  async function handleLogout() {
-    await signOut();
-    router.replace("/login");
-  }
+  const {
+    transactions,
+    totals,
+    analytics,
+    categories,
+    profile,
+    isPending,
+  } = useDashboard();
 
   function handleAddExpense() {
     router.push("/(protected)/add-transaction");
+  }
+
+  if (isPending) {
+    return <Screen />;
   }
 
   return (
@@ -43,6 +44,21 @@ export default function DashboardScreen() {
         balance={`₹${totals.balance.toLocaleString()}`}
       />
 
+      <BudgetProgressCard
+        spent={totals.expense}
+        budget={profile?.monthly_budget ?? 0}
+      />
+
+      <Section title="Monthly Spending">
+        <MonthlyChart values={analytics} />
+      </Section>
+
+      <Section title="Spending by Category">
+        <CategoryBreakdown
+          categories={categories}
+        />
+      </Section>
+
       <StatsSection
         income={totals.income}
         expense={totals.expense}
@@ -52,14 +68,14 @@ export default function DashboardScreen() {
       <QuickActions />
 
       <Section title="Recent Transactions">
-        <TransactionList />
+        <TransactionList
+          data={transactions.slice(0, 5)}
+        />
       </Section>
 
-      <AIInsightCard />
-
-      <Button
-        title="Logout"
-        onPress={handleLogout}
+      <AIInsightCard
+        totals={totals}
+        profile={profile}
       />
 
       <FloatingButton

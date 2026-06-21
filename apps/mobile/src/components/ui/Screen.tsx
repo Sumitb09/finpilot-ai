@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAppTheme } from "../../theme/useAppTheme";
@@ -20,16 +20,17 @@ export default function Screen({ children }: Props) {
         },
       ]}
     >
-      <View
-        style={[
+      <ScrollView
+        contentContainerStyle={[
           styles.container,
           {
             backgroundColor: palette.background,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         {children}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -40,7 +41,8 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    flex: 1,
     paddingHorizontal: 20,
+    paddingBottom: 120,
+    flexGrow: 1,
   },
 });
