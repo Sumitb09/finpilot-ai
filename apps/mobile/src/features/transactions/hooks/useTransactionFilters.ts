@@ -1,37 +1,51 @@
 import { useMemo, useState } from "react";
 
-import { useTransactions } from "./useTransactions";
-import {
-  filterTransactions,
-  TransactionFilter,
-} from "../utils/filterTransactions";
+import { Transaction } from "../types/transaction";
 
-export function useTransactionFilters() {
+export type TransactionFilter =
+  | "all"
+  | "income"
+  | "expense";
+
+export function useTransactionFilters(
+  transactions: Transaction[]
+) {
   const [search, setSearch] = useState("");
+
   const [filter, setFilter] =
     useState<TransactionFilter>("all");
 
-  const {
-    data = [],
-    isPending,
-  } = useTransactions();
+  const filteredTransactions = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-  const transactions = useMemo(
-    () =>
-      filterTransactions(
-        data,
-        search,
-        filter
-      ),
-    [data, search, filter]
-  );
+    return transactions.filter((transaction) => {
+      const matchesSearch =
+        transaction.title
+          .toLowerCase()
+          .includes(query) ||
+        transaction.note
+          ?.toLowerCase()
+          .includes(query) ||
+        transaction.categories?.name
+          .toLowerCase()
+          .includes(query);
+
+      const matchesFilter =
+        filter === "all"
+          ? true
+          : transaction.type === filter;
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [transactions, search, filter]);
 
   return {
-    transactions,
     search,
     setSearch,
+
     filter,
     setFilter,
-    isPending,
+
+    filteredTransactions,
   };
 }

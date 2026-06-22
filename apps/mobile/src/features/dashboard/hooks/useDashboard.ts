@@ -1,15 +1,9 @@
 import { useMemo } from "react";
-
 import { useTransactions } from "../../transactions/hooks/useTransactions";
 import { useProfile } from "../../settings/hooks/useProfile";
-
-import {
-  getCategoryBreakdown,
-} from "../services/dashboard.service";
-
-import {
-  getMonthlyAnalytics,
-} from "../services/analytics.service";
+import { getCategoryBreakdown, } from "../services/dashboard.service";
+import { getMonthlyAnalytics, getLargestExpense } from "../services/analytics.service";
+import { generateInsights } from "../services/insight.service";
 
 export function useDashboard() {
   const {
@@ -52,17 +46,28 @@ export function useDashboard() {
     [data]
   );
 
+  const largestExpense = useMemo(
+    () => getLargestExpense(data),
+    [data]
+  );
+
+  const insights = useMemo(
+    () =>
+      generateInsights(
+        data,
+        profile?.monthly_budget ?? 0
+      ),
+    [data, profile]
+  );
+
   return {
     transactions: data,
-
     totals,
-
     categories,
-
+    largestExpense,
     analytics,
-
     profile,
-
+    insights,
     isPending:
       transactionsLoading || profileLoading,
   };

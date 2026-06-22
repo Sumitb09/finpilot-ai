@@ -2,20 +2,26 @@ import React from "react";
 import {
   View,
   TextInput,
+  Pressable,
   StyleSheet,
 } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 
 import { useAppTheme } from "../../../theme/useAppTheme";
 
 type Props = {
   value: string;
+
   onChangeText(text: string): void;
+
+  onSend(): void;
 };
 
-export default function SearchBar({
+export default function ChatInput({
   value,
   onChangeText,
+  onSend,
 }: Props) {
   const { palette } = useAppTheme();
 
@@ -24,17 +30,11 @@ export default function SearchBar({
       style={[
         styles.container,
         {
-          backgroundColor: palette.card,
           borderColor: palette.border,
+          backgroundColor: palette.card,
         },
       ]}
     >
-      <Ionicons
-        name="search"
-        size={20}
-        color={palette.subtext}
-      />
-
       <TextInput
         style={[
           styles.input,
@@ -42,11 +42,21 @@ export default function SearchBar({
             color: palette.text,
           },
         ]}
-        placeholder="Search transactions..."
-        placeholderTextColor={palette.subtext}
         value={value}
         onChangeText={onChangeText}
+        placeholder="Ask FinPilot AI..."
+        placeholderTextColor={
+          palette.subtext
+        }
       />
+
+      <Pressable onPress={onSend}>
+        <Ionicons
+          name="send"
+          size={22}
+          color={palette.primary}
+        />
+      </Pressable>
     </View>
   );
 }
@@ -54,17 +64,23 @@ export default function SearchBar({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
+
     alignItems: "center",
-    borderRadius: 14,
+
     borderWidth: 1,
-    paddingHorizontal: 16,
-    marginBottom: 16,
+
+    borderRadius: 16,
+
+    paddingHorizontal: 14,
+
+    paddingVertical: 8,
   },
 
   input: {
     flex: 1,
-    marginLeft: 10,
-    paddingVertical: 14,
+
     fontSize: 16,
+
+    marginRight: 10,
   },
 });
