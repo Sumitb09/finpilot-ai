@@ -4,6 +4,7 @@ import { useProfile } from "../../settings/hooks/useProfile";
 import { getCategoryBreakdown, } from "../services/dashboard.service";
 import { getMonthlyAnalytics, getLargestExpense } from "../services/analytics.service";
 import { generateInsights } from "../services/insight.service";
+import { calculateFinancialHealth } from "../../analytics/services/healthScore.service";
 
 export function useDashboard() {
   const {
@@ -60,6 +61,17 @@ export function useDashboard() {
     [data, profile]
   );
 
+  const health = useMemo(
+    () =>
+      calculateFinancialHealth(
+        data,
+        profile?.monthly_budget ?? 0
+      ),
+    [data, profile]
+  );
+  
+  console.log(health);
+
   return {
     transactions: data,
     totals,
@@ -68,6 +80,7 @@ export function useDashboard() {
     analytics,
     profile,
     insights,
+    health,
     isPending:
       transactionsLoading || profileLoading,
   };

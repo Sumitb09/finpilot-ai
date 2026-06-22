@@ -15,6 +15,7 @@ import TransactionList from "../../transactions/components/TransactionList";
 import { useDashboard } from "../hooks/useDashboard";
 import IncomeExpenseCard from "../components/IncomeExpenseCard";
 import LargestExpenseCard from "../components/LargestExpenseCard";
+import FinancialHealthCard from "../components/FinancialHealthCard";
 
 export default function DashboardScreen() {
   const {
@@ -25,6 +26,7 @@ export default function DashboardScreen() {
     largestExpense,
     profile,
     insights,
+    health,
     isPending,
   } = useDashboard();
 
@@ -48,7 +50,19 @@ export default function DashboardScreen() {
         spent={totals.expense}
         budget={profile?.monthly_budget ?? 0}
       />
-
+      <FinancialHealthCard
+        score={health.score}
+        status={health.status}
+        savingsRatio={health.savingsRatio}
+        expenseRatio={health.expenseRatio}
+        budgetUsage={health.budgetUsage}
+        largestExpenseRatio={
+          health.largestExpenseRatio
+        }
+        categoryDiversity={
+          health.categoryDiversity
+        }
+        />
       <Section title="Monthly Spending">
         <MonthlyChart values={analytics} />
       </Section>

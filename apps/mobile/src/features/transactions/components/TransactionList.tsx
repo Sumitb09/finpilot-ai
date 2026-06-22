@@ -71,15 +71,13 @@ export default function TransactionList({
             item.type === "expense" ? "-" : "+"
           }₹${Number(item.amount).toLocaleString()}`}
           income={item.type === "income"}
-          onPress={() =>
-            router.push({
-              pathname:
-                "/(protected)/transaction/[id]",
-              params: {
-                id: item.id,
-              },
-            })
-          }
+          category={
+            item.categories?.name ??        
+            "General"        
+          }        
+            date={new Date(
+              item.transaction_date        
+            ).toLocaleDateString()}
         />
       )}
     />
