@@ -18,10 +18,10 @@ export function useReceiptScanner() {
       const base64 =
         await imageToBase64(uri);
 
-      const response =
+        const result =
         await analyzeReceipt(base64);
-
-      return JSON.parse(response);
+      
+      return result as ReceiptResult;
     } finally {
       setLoading(false);
     }

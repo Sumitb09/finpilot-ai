@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 
 import { ChatMessage } from "../types/chat";
 import { askGemini } from "../services/ai.service";
-import { buildPrompt } from "../services/promptBuilder";
 import {
   getMessages,
   saveMessage,
@@ -91,15 +90,18 @@ export function useChat(
         userMessage.content
       );
 
-      const prompt = buildPrompt(
-        text,
-        updatedMessages.slice(-8),
-        transactions,
-        monthlyBudget
-      );
-
       const reply =
-        await askGemini(prompt);
+        await askGemini({
+            prompt: text,
+            history: updatedMessages
+            .slice(-8)
+            .map((message) => ({
+              role: message.role,
+              content: message.content,
+            })),
+            transactions,
+            monthlyBudget,
+        });
 
       if (!reply.trim()) {
         throw new Error(

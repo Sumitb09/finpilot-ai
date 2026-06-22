@@ -1,48 +1,32 @@
-import { GoogleGenAI } from "@google/genai";
+import { supabase } from "../../../lib/supabase/client";
 
-const apiKey =
-  process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-
-  console.log(
-    "Gemini API Key:",
-    process.env.EXPO_PUBLIC_GEMINI_API_KEY
-  );
-
-if (!apiKey) {
-  console.warn(
-    "EXPO_PUBLIC_GEMINI_API_KEY is not configured."
-  );
-}
-
-const ai = new GoogleGenAI({
-  apiKey: apiKey ?? "",
-});
+type ChatPayload = {
+  prompt: string;
+  history?: unknown[];
+  transactions?: unknown[];
+  monthlyBudget?: number;
+};
 
 export async function askGemini(
-  prompt: string
-): Promise<string> {
-  try {
-    const response =
-      await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-      });
+  payload: ChatPayload
+) {
+  const { data, error } =
+    await supabase.functions.invoke("ai", {
+      body: {
+        task: "chat",
+        payload,
+      },
+    });
 
-    const text = response.text?.trim();
-
-    if (!text) {
-      throw new Error(
-        "Gemini returned an empty response."
-      );
-    }
-
-    return text;
-  } catch (error) {
-    console.error(
-      "Gemini API Error:",
-      error
-    );
-
+  if (error) {
     throw error;
   }
+
+  if (!data.success) {
+    throw new Error(
+      data.error ?? "AI request failed."
+    );
+  }
+
+  return data.data.reply;
 }
