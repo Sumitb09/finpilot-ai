@@ -31,10 +31,9 @@ export default function Screen({
       {scroll ? (
         <ScrollView
           contentContainerStyle={[
-            styles.container,
+            styles.scrollContent,
             {
-              backgroundColor:
-                palette.background,
+              backgroundColor: palette.background,
             },
           ]}
           showsVerticalScrollIndicator={false}
@@ -46,8 +45,7 @@ export default function Screen({
           style={[
             styles.container,
             {
-              backgroundColor:
-                palette.background,
+              backgroundColor: palette.background,
             },
           ]}
         >
@@ -65,6 +63,12 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },

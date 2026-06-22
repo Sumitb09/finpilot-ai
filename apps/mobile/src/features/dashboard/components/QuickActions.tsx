@@ -31,7 +31,7 @@ export default function QuickActions() {
           emoji="📷"
           title="Scan"
           onPress={() => {
-            // OCR (Sprint 8)
+            router.push("/(protected)/scan-receipt")
           }}
         />
 
