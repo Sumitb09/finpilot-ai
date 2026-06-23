@@ -1,54 +1,45 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import Card from "../../../components/ui/Card";
-import { generateInsight } from "../utils/generateInsight";
+import Typography from "../../../components/ui/Typography";
 
 type Props = {
-  totals: {
-    income: number;
-    expense: number;
-    balance: number;
-    savings: number;
-  };
-  profile: {
-    monthly_budget: number;
-  } | null;
+  insights: string[];
 };
 
 export default function AIInsightCard({
-  totals,
-  profile,
+  insights,
 }: Props) {
-  const message = generateInsight(
-    totals,
-    profile
-  );
-
   return (
     <Card>
-      <Text style={styles.title}>
-        🤖 AI Insight
-      </Text>
+      <Typography
+        variant="h3"
+        style={styles.title}
+      >
+        🤖 Smart Insights
+      </Typography>
 
-      <Text style={styles.body}>
-        {message}
-      </Text>
+      {insights.map((insight, index) => (
+        <Typography
+          key={index}
+          style={styles.insight}
+        >
+          • {insight}
+        </Typography>
+      ))}
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
   title: {
-    color: "#fff",
     fontWeight: "700",
-    fontSize: 18,
-    marginBottom: 12,
+    marginBottom: 16,
   },
 
-  body: {
-    color: "#CBD5E1",
-    lineHeight: 24,
-    fontSize: 15,
+  insight: {
+    marginBottom: 12,
+    lineHeight: 22,
   },
 });

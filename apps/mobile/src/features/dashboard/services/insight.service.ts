@@ -1,26 +1,71 @@
-export function generateInsight(
-    totals,
-    categories,
-    profile,
-) {
+import { Transaction } from "../../transactions/types/transaction";
 
-    if (totals.expense === 0)
-        return "Add your first expense to receive personalized insights.";
+import {
+  getLargestExpense,
+  getAverageDailySpend,
+  getCurrentMonthSummary,
+} from "./analytics.service";
 
-    if (
-        profile?.monthly_budget &&
-        totals.expense >
-        profile.monthly_budget
-    ) {
-        return `You've exceeded your monthly budget by ₹${(
-            totals.expense -
-            profile.monthly_budget
-        ).toLocaleString()}.`;
-    }
+export function generateInsights(
+  transactions: Transaction[],
+  monthlyBudget = 0
+): string[] {
+  const insights: string[] = [];
 
-    if (categories.length) {
-        return `${categories[0].category} accounts for ${categories[0].percentage}% of your expenses.`;
-    }
+  const summary =
+    getCurrentMonthSummary(transactions);
 
-    return "Great work tracking your finances!";
+  const largest =
+    getLargestExpense(transactions);
+
+  const average =
+    getAverageDailySpend(transactions);
+
+  if (summary.expense === 0) {
+    insights.push(
+      "Start tracking your expenses to unlock AI insights."
+    );
+
+    return insights;
+  }
+
+  if (largest) {
+    insights.push(
+      `Your largest expense was ₹${largest.amount.toLocaleString()} on "${largest.title}".`
+    );
+  }
+
+  insights.push(
+    `Your average daily spending is ₹${average.amount.toLocaleString()}.`
+  );
+
+  if (
+    monthlyBudget > 0 &&
+    summary.expense > monthlyBudget
+  ) {
+    insights.push(
+      `You have exceeded your monthly budget by ₹${(
+        summary.expense - monthlyBudget
+      ).toLocaleString()}.`
+    );
+  }
+
+  if (
+    monthlyBudget > 0 &&
+    summary.expense <= monthlyBudget
+  ) {
+    insights.push(
+      `You still have ₹${(
+        monthlyBudget - summary.expense
+      ).toLocaleString()} left in your monthly budget.`
+    );
+  }
+
+  if (summary.savings > 0) {
+    insights.push(
+      `You've saved ₹${summary.savings.toLocaleString()} this month. Great job!`
+    );
+  }
+
+  return insights;
 }

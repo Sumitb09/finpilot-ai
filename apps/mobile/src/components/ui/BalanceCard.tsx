@@ -1,65 +1,82 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-
-import { useAppTheme } from "../../theme/useAppTheme";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Props = {
   balance: string;
 };
 
-export default function BalanceCard({ balance }: Props) {
-  const { palette } = useAppTheme();
-
+export default function BalanceCard({
+  balance,
+}: Props) {
   return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: palette.card,
-          borderColor: palette.border,
-        },
+    <LinearGradient
+      colors={[
+        "#2563EB",
+        "#3B82F6",
+        "#60A5FA",
       ]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.card}
     >
-      <Text
-        style={[
-          styles.label,
-          {
-            color: palette.secondaryText,
-          },
-        ]}
-      >
+      <Text style={styles.greeting}>
+        👋 Welcome back
+      </Text>
+
+      <Text style={styles.label}>
         Current Balance
       </Text>
 
-      <Text
-        style={[
-          styles.balance,
-          {
-            color: palette.text,
-          },
-        ]}
-      >
+      <Text style={styles.balance}>
         {balance}
       </Text>
-    </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          📈 FinPilot AI is monitoring your finances
+        </Text>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 28,
     padding: 24,
-    marginTop: 30,
+    marginTop: 24,
+    marginHorizontal: 2,
+    elevation: 6,
+  },
+
+  greeting: {
+    color: "#DBEAFE",
+    fontSize: 16,
+    marginBottom: 12,
   },
 
   label: {
-    fontSize: 16,
+    color: "#BFDBFE",
+    fontSize: 15,
   },
 
   balance: {
-    fontSize: 38,
-    fontWeight: "700",
+    color: "#FFFFFF",
+    fontSize: 42,
+    fontWeight: "800",
     marginTop: 8,
+  },
+
+  footer: {
+    marginTop: 28,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.2)",
+    paddingTop: 14,
+  },
+
+  footerText: {
+    color: "#E0F2FE",
+    fontSize: 14,
   },
 });

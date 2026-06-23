@@ -1,5 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { router } from "expo-router";
 
 import Section from "../../../components/ui/Section";
 import QuickActionCard from "../../../components/ui/QuickActionCard";
@@ -11,25 +12,35 @@ export default function QuickActions() {
         <QuickActionCard
           emoji="➕"
           title="Expense"
-          onPress={() => {}}
+          onPress={() =>
+            router.push("/(protected)/add-transaction")
+          }
         />
 
         <QuickActionCard
           emoji="💰"
           title="Income"
-          onPress={() => {}}
+          onPress={() =>
+            router.push(
+              "/(protected)/add-transaction?type=income"
+            )
+          }
         />
 
         <QuickActionCard
           emoji="📷"
           title="Scan"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/(protected)/scan-receipt")
+          }}
         />
 
         <QuickActionCard
           emoji="🤖"
           title="AI Coach"
-          onPress={() => {}}
+          onPress={() =>
+            router.push("/(protected)/(tabs)/ai")
+          }
         />
       </View>
     </Section>

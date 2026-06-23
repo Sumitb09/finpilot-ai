@@ -36,16 +36,16 @@ export default function SearchBar({
       />
 
       <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder="Search transactions"
-        placeholderTextColor={palette.subtext}
         style={[
           styles.input,
           {
             color: palette.text,
           },
         ]}
+        placeholder="Search transactions..."
+        placeholderTextColor={palette.subtext}
+        value={value}
+        onChangeText={onChangeText}
       />
     </View>
   );
@@ -55,16 +55,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
     borderRadius: 14,
-    paddingHorizontal: 14,
+    borderWidth: 1,
+    paddingHorizontal: 16,
     marginBottom: 16,
   },
 
   input: {
     flex: 1,
-    paddingVertical: 14,
     marginLeft: 10,
+    paddingVertical: 14,
     fontSize: 16,
   },
 });
