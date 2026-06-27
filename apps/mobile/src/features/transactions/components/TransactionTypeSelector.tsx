@@ -1,41 +1,89 @@
 import React from "react";
 import {
-  View,
-  TouchableOpacity,
-  Text,
+  Pressable,
   StyleSheet,
+  View,
 } from "react-native";
+
+import Typography from "../../../components/ui/Typography";
+import { useAppTheme } from "../../../theme/useAppTheme";
 
 type Props = {
   value: "income" | "expense";
-  onChange: (value: "income" | "expense") => void;
+  onChange: (
+    value: "income" | "expense"
+  ) => void;
 };
 
 export default function TransactionTypeSelector({
   value,
   onChange,
 }: Props) {
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.button,
-          value === "expense" && styles.activeExpense,
-        ]}
-        onPress={() => onChange("expense")}
-      >
-        <Text style={styles.text}>Expense</Text>
-      </TouchableOpacity>
+  const { palette } = useAppTheme();
 
-      <TouchableOpacity
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: palette.card,
+          borderColor: palette.border,
+        },
+      ]}
+    >
+      <Pressable
+        onPress={() =>
+          onChange("expense")
+        }
         style={[
-          styles.button,
-          value === "income" && styles.activeIncome,
+          styles.option,
+          value === "expense" && {
+            backgroundColor:
+              "#EF4444",
+          },
         ]}
-        onPress={() => onChange("income")}
       >
-        <Text style={styles.text}>Income</Text>
-      </TouchableOpacity>
+        <Typography
+          style={[
+            styles.text,
+            {
+              color:
+                value === "expense"
+                  ? "#FFFFFF"
+                  : palette.text,
+            },
+          ]}
+        >
+          💸 Expense
+        </Typography>
+      </Pressable>
+
+      <Pressable
+        onPress={() =>
+          onChange("income")
+        }
+        style={[
+          styles.option,
+          value === "income" && {
+            backgroundColor:
+              "#22C55E",
+          },
+        ]}
+      >
+        <Typography
+          style={[
+            styles.text,
+            {
+              color:
+                value === "income"
+                  ? "#FFFFFF"
+                  : palette.text,
+            },
+          ]}
+        >
+          💰 Income
+        </Typography>
+      </Pressable>
     </View>
   );
 }
@@ -43,28 +91,21 @@ export default function TransactionTypeSelector({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    marginBottom: 20,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 4,
+    marginBottom: 24,
   },
 
-  button: {
+  option: {
     flex: 1,
-    padding: 16,
     borderRadius: 14,
+    paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#1E293B",
-    marginHorizontal: 4,
-  },
-
-  activeExpense: {
-    backgroundColor: "#EF4444",
-  },
-
-  activeIncome: {
-    backgroundColor: "#22C55E",
   },
 
   text: {
-    color: "white",
+    fontSize: 16,
     fontWeight: "700",
   },
 });

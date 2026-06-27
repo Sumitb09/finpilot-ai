@@ -1,49 +1,105 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 import CircularProgress from "../../../components/ui/CircularProgress";
 import { useAppTheme } from "../../../theme/useAppTheme";
 
+import { FinancialHealth } from "../../analytics/services/health-score.service";
+
 type Props = {
-  score: number;
-  status: string;
-  savingsRatio: number;
-  expenseRatio: number;
-  budgetUsage: number;
-  largestExpenseRatio: number;
-  categoryDiversity: number;
+  health: FinancialHealth;
 };
 
-function MetricRow({
+function ProgressMetric({
+  icon,
   label,
   value,
+  color,
+  palette,
 }: {
+  icon: keyof typeof Ionicons.glyphMap;
   label: string;
-  value: string;
+  value: number;
+  color: string;
+  palette: any;
 }) {
-  return (
-    <View style={styles.metricRow}>
-      <Typography>{label}</Typography>
+  const percent = Math.max(0, Math.min(100, Math.round(value * 100)));
 
-      <Typography style={styles.metricValue}>
-        {value}
-      </Typography>
+  return (
+    <View
+      style={[
+        styles.metricCard,
+        {
+          backgroundColor: palette.surface,
+          borderColor: palette.border,
+        },
+      ]}
+    >
+      <View style={styles.metricHeader}>
+        <View style={styles.metricLeft}>
+          <Ionicons
+            name={icon}
+            size={18}
+            color={color}
+          />
+
+          <Typography
+            style={styles.metricLabel}
+          >
+            {label}
+          </Typography>
+        </View>
+
+        <Typography
+          style={[
+            styles.metricValue,
+            { color },
+          ]}
+        >
+          {percent}%
+        </Typography>
+      </View>
+
+      <View
+        style={[
+          styles.progressTrack,
+          {
+            backgroundColor:
+              palette.border,
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.progressFill,
+            {
+              width: `${percent}%`,
+              backgroundColor: color,
+            },
+          ]}
+        />
+      </View>
     </View>
   );
 }
 
 export default function FinancialHealthCard({
-  score,
-  status,
-  savingsRatio,
-  expenseRatio,
-  budgetUsage,
-  largestExpenseRatio,
-  categoryDiversity,
+  health,
 }: Props) {
   const { palette } = useAppTheme();
+
+  const {
+    score,
+    status,
+    savingsRatio,
+    expenseRatio,
+    budgetUsage,
+    largestExpenseRatio,
+    categoryDiversity,
+  } = health;
 
   const color =
     score >= 90
@@ -56,101 +112,184 @@ export default function FinancialHealthCard({
       ? "#F97316"
       : "#EF4444";
 
+  const description =
+    score >= 90
+      ? "Outstanding financial discipline. You're building long-term wealth."
+      : score >= 75
+      ? "You're managing your money well with only minor improvements needed."
+      : score >= 60
+      ? "A few smarter budgeting decisions can significantly improve your financial health."
+      : "Your spending is outweighing your savings. Start reducing unnecessary expenses.";
+
+  const aiTip =
+    score >= 90
+      ? "Excellent work! Continue investing consistently and maintain an emergency fund."
+      : score >= 75
+      ? "Reducing discretionary expenses can push your health score above 90."
+      : score >= 60
+      ? "Increase your monthly savings by 10% while staying within your budget."
+      : "Focus on reducing large expenses and prioritize building a savings habit.";
+
   return (
     <Card>
-      <Typography
-        variant="h3"
-        style={styles.title}
-      >
-        💚 Financial Health
-      </Typography>
+      {/* Header */}
 
-      <View style={styles.row}>
+      <View style={styles.header}>
+        <View>
+          <Typography
+            variant="h3"
+            style={styles.title}
+          >
+            Financial Health
+          </Typography>
+
+          <Typography
+            style={{
+              color: palette.subtext,
+              marginTop: 4,
+            }}
+          >
+            Updated from your latest transactions
+          </Typography>
+        </View>
+
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: `${color}20`,
+            },
+          ]}
+        >
+          <Typography
+            style={{
+              color,
+              fontWeight: "700",
+            }}
+          >
+            {status}
+          </Typography>
+        </View>
+      </View>
+
+      {/* Hero */}
+
+      <View style={styles.hero}>
         <CircularProgress
           progress={score}
           color={color}
-          label={status}
+          label={`${score}`}
         />
 
-        <View style={styles.info}>
+        <View style={styles.heroInfo}>
+          <Typography
+            variant="h1"
+            style={{ color }}
+          >
+            {score}
+          </Typography>
+
           <Typography
             variant="h2"
-            style={{ color }}
+            style={{
+              marginTop: 2,
+            }}
           >
             {status}
           </Typography>
 
           <Typography
-            style={[
-              styles.description,
-              {
-                color: palette.subtext,
-              },
-            ]}
+            style={{
+              color: palette.subtext,
+              marginTop: 8,
+              lineHeight: 22,
+            }}
           >
-            Your financial health is calculated
-            from your savings, spending,
-            budget usage and transaction
-            patterns.
+            {description}
           </Typography>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      {/* Metrics */}
 
-      <MetricRow
-        label="💰 Savings Rate"
-        value={`${Math.round(
-          savingsRatio * 100
-        )}%`}
-      />
+      <View style={styles.metrics}>
+        <ProgressMetric
+          icon="wallet-outline"
+          label="Savings Rate"
+          value={savingsRatio}
+          color={color}
+          palette={palette}
+        />
 
-      <MetricRow
-        label="💸 Expense Ratio"
-        value={`${Math.round(
-          expenseRatio * 100
-        )}%`}
-      />
+        <ProgressMetric
+          icon="trending-down-outline"
+          label="Expense Ratio"
+          value={expenseRatio}
+          color={color}
+          palette={palette}
+        />
 
-      <MetricRow
-        label="🎯 Budget Used"
-        value={`${Math.round(
-          budgetUsage * 100
-        )}%`}
-      />
+        <ProgressMetric
+          icon="pie-chart-outline"
+          label="Budget Usage"
+          value={budgetUsage}
+          color={color}
+          palette={palette}
+        />
 
-      <MetricRow
-        label="🛒 Largest Expense"
-        value={`${Math.round(
-          largestExpenseRatio * 100
-        )}%`}
-      />
+        <ProgressMetric
+          icon="cart-outline"
+          label="Largest Expense"
+          value={largestExpenseRatio}
+          color={color}
+          palette={palette}
+        />
 
-      <MetricRow
-        label="📊 Diversity"
-        value={`${Math.round(
-          categoryDiversity * 100
-        )}%`}
-      />
+        <ProgressMetric
+          icon="analytics-outline"
+          label="Category Diversity"
+          value={categoryDiversity}
+          color={color}
+          palette={palette}
+        />
+      </View>
 
-      <View style={styles.tip}>
-        <Typography variant="h3">
-          💡 AI Tip
-        </Typography>
+      {/* AI Insight */}
+
+      <View
+        style={[
+          styles.aiCard,
+          {
+            backgroundColor: `${color}10`,
+            borderColor: `${color}40`,
+          },
+        ]}
+      >
+        <View style={styles.aiHeader}>
+          <Ionicons
+            name="sparkles"
+            size={22}
+            color={color}
+          />
+
+          <Typography
+            variant="h3"
+            style={{
+              marginLeft: 8,
+            }}
+          >
+            AI Insight
+          </Typography>
+        </View>
 
         <Typography
           style={{
-            color: palette.subtext,
-            marginTop: 8,
+            marginTop: 12,
+            color: palette.text,
+            lineHeight: 23,
           }}
         >
-          {score >= 90
-            ? "Excellent financial discipline. Keep investing and maintaining your savings."
-            : score >= 75
-            ? "You're doing well. Reducing discretionary spending could push your score above 90."
-            : score >= 60
-            ? "Focus on increasing your savings rate while staying within your monthly budget."
-            : "Reduce unnecessary expenses and improve your savings to strengthen your financial health."}
+          {aiTip}
         </Typography>
       </View>
     </Card>
@@ -158,42 +297,86 @@ export default function FinancialHealthCard({
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: 20,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 28,
   },
 
-  row: {
+  title: {
+    fontWeight: "700",
+  },
+
+  badge: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 30,
+  },
+
+  hero: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+
+  heroInfo: {
+    flex: 1,
+    marginLeft: 22,
+  },
+
+  metrics: {
+    gap: 14,
+  },
+
+  metricCard: {
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 16,
+  },
+
+  metricHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  metricLeft: {
     flexDirection: "row",
     alignItems: "center",
   },
 
-  info: {
-    flex: 1,
-    marginLeft: 20,
-  },
-
-  description: {
-    marginTop: 8,
-    lineHeight: 22,
-  },
-
-  divider: {
-    height: 1,
-    backgroundColor: "#E2E8F0",
-    marginVertical: 24,
-  },
-
-  metricRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 14,
+  metricLabel: {
+    marginLeft: 10,
+    fontWeight: "600",
   },
 
   metricValue: {
     fontWeight: "700",
+    fontSize: 16,
   },
 
-  tip: {
-    marginTop: 20,
+  progressTrack: {
+    height: 8,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    height: "100%",
+    borderRadius: 10,
+  },
+
+  aiCard: {
+    marginTop: 26,
+    borderWidth: 1,
+    borderRadius: 22,
+    padding: 18,
+  },
+
+  aiHeader: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

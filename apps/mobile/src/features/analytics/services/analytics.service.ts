@@ -12,12 +12,6 @@ export interface IncomeExpenseAnalytics {
   expense: number;
 }
 
-export interface LargestExpense {
-  title: string;
-  amount: number;
-  category: string;
-}
-
 export interface CurrentMonthSummary {
   income: number;
   expense: number;
@@ -99,7 +93,7 @@ export function getCurrentMonthSummary(
 
 export function getLargestExpense(
   transactions: Transaction[]
-): LargestExpense | null {
+): Transaction | null {
   const expenses = transactions.filter(
     (transaction) =>
       transaction.type === "expense"
@@ -109,21 +103,13 @@ export function getLargestExpense(
     return null;
   }
 
-  const largest = expenses.reduce(
+  return expenses.reduce(
     (previous, current) =>
       Number(previous.amount) >
       Number(current.amount)
         ? previous
         : current
   );
-
-  return {
-    title: largest.title,
-    amount: Number(largest.amount),
-    category:
-      largest.categories?.name ??
-      "Unknown",
-  };
 }
 
 export function getAverageDailySpend(

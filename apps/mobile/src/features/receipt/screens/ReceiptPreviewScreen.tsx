@@ -1,18 +1,40 @@
 import React from "react";
 import { ScrollView } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 import Screen from "../../../components/ui/Screen";
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 import Button from "../../../components/ui/Button";
 
-export default function ReceiptPreviewScreen() {
-  const { receipt } = useLocalSearchParams();
+import { useProfile } from "../../settings/hooks/useProfile";
+import { formatCurrency } from "../../../utils/currency";
+import { useReceiptStore } from "../store";
+import { router } from "expo-router";
 
-  const data = JSON.parse(
-    receipt as string
-  );
+export default function ReceiptPreviewScreen() {
+  const { t } = useTranslation();
+
+  const { receipt } = useReceiptStore();
+
+  const { data: profile } = useProfile();
+
+  const currency = profile?.currency ?? "INR";
+
+  if (!receipt) {
+    return (  
+      <Screen> 
+        <Card> 
+          <Typography variant="h2">  
+            No receipt found  
+          </Typography>  
+          <Typography>  
+            Please scan a receipt first.  
+          </Typography> 
+        </Card> 
+      </Screen>  
+    ); 
+  }
 
   return (
     <Screen>
@@ -21,54 +43,58 @@ export default function ReceiptPreviewScreen() {
       >
         <Card>
           <Typography variant="h2">
-            🧾 Receipt Preview
+            🧾 {t("receipt.preview")}
           </Typography>
 
           <Typography>
-            Merchant
+            {t("receipt.merchant")}
           </Typography>
+
           <Typography>
-            {data.merchant}
+            {receipt.merchant}
           </Typography>
 
           <Typography
             style={{ marginTop: 20 }}
           >
-            Amount
+            {t("receipt.amount")}
           </Typography>
 
           <Typography>
-            ₹{data.amount}
+            {formatCurrency(
+              Number(receipt.amount),
+              currency
+            )}
           </Typography>
 
           <Typography
             style={{ marginTop: 20 }}
           >
-            Category
+            {t("receipt.category")}
           </Typography>
 
           <Typography>
-            {data.category}
+            {receipt.category}
           </Typography>
 
           <Typography
             style={{ marginTop: 20 }}
           >
-            Date
+            {t("receipt.date")}
           </Typography>
 
           <Typography>
-            {data.date}
+            {receipt.date}
           </Typography>
 
           <Typography
             style={{ marginTop: 24 }}
             variant="h3"
           >
-            Items
+            {t("receipt.items")}
           </Typography>
 
-          {data.items.map(
+          {receipt.items?.map(
             (
               item: any,
               index: number
@@ -76,15 +102,19 @@ export default function ReceiptPreviewScreen() {
               <Typography
                 key={index}
               >
-                • {item.name} — ₹
-                {item.price}
+                • {item.name} —{" "}
+                {formatCurrency(
+                  Number(item.price),
+                  currency
+                )}
               </Typography>
             )
           )}
 
           <Button
-            title="💾 Save Transaction"
-            onPress={() => {}}
+            title="Continue"
+            onPress={() => {router.push("/(protected)/add-transaction");
+            }}
           />
         </Card>
       </ScrollView>

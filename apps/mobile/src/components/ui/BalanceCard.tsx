@@ -79,4 +79,8 @@ const styles = StyleSheet.create({
     color: "#E0F2FE",
     fontSize: 14,
   },
+
+  negative: {
+    color: "#EF4444",
+  },
 });

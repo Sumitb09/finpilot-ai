@@ -1,21 +1,22 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 
 import { useAppTheme } from "../../../theme/useAppTheme";
+import { formatCurrency } from "../../../utils/currency";
+
+import { Transaction } from "../../transactions/types/transaction";
 
 type Props = {
-  title: string;
-  category: string;
-  amount: number;
+  transaction: Transaction;
+  currency: string;
 };
 
 export default function LargestExpenseCard({
-  title,
-  category,
-  amount,
+  transaction,
+  currency,
 }: Props) {
   const { palette } = useAppTheme();
 
@@ -35,7 +36,7 @@ export default function LargestExpenseCard({
           marginBottom: 20,
         }}
       >
-        {title}
+        {transaction.title}
       </Typography>
 
       <View style={styles.row}>
@@ -47,7 +48,10 @@ export default function LargestExpenseCard({
           Category
         </Typography>
 
-        <Typography>{category}</Typography>
+        <Typography>
+          {transaction.categories?.name ??
+            "Other"}
+        </Typography>
       </View>
 
       <View style={styles.row}>
@@ -65,7 +69,10 @@ export default function LargestExpenseCard({
             fontWeight: "700",
           }}
         >
-          ₹{amount.toLocaleString()}
+          {formatCurrency(
+            Number(transaction.amount),
+            currency
+          )}
         </Typography>
       </View>
 

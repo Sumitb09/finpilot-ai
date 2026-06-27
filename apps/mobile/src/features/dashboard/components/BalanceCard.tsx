@@ -1,46 +1,84 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
+import Typography from "../../../components/ui/Typography";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { formatCurrency } from "../../../utils/currency";
 
 type Props = {
-  balance: string;
+  balance: number;
+  currency: string;
+  change: number | null;
 };
 
-export default function BalanceCard({ balance }: Props) {
+export default function BalanceCard({
+  balance,
+  currency,
+  change,
+}: Props) {
+  const { t } = useTranslation();
+  const { palette } = useAppTheme();
+
+  const isPositive =
+    change === null || change >= 0;
+
   return (
-    <Card>
-      <Text style={styles.label}>
-        Total Balance
-      </Text>
+    <Card style={styles.card}>
+      <Typography
+        style={{
+          color: palette.subtext,
+        }}
+      >
+        {t("dashboard.totalBalance")}
+      </Typography>
 
-      <Text style={styles.balance}>
-        {balance}
-      </Text>
+      <Typography
+        variant="h1"
+        style={[
+          styles.balance,
+          {
+            color: palette.text,
+          },
+        ]}
+      >
+        {formatCurrency(balance, currency)}
+      </Typography>
 
-      <Text style={styles.change}>
-        ▲ +18.5% this month
-      </Text>
+      <Typography
+        style={[
+          styles.change,
+          {
+            color: isPositive
+              ? palette.success
+              : palette.danger,
+          },
+        ]}
+      >
+        {change === null
+          ? t("dashboard.firstMonth")
+          : `${isPositive ? "▲" : "▼"} ${Math.abs(
+              change
+            ).toFixed(1)}% ${t(
+              "dashboard.thisMonth"
+            )}`}
+      </Typography>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-    color: "#94A3B8",
-    fontSize: 16,
+  card: {
+    borderRadius: 24,
   },
 
   balance: {
-    color: "#FFFFFF",
-    fontSize: 34,
-    fontWeight: "700",
-    marginTop: 8,
+    marginTop: 10,
   },
 
   change: {
-    color: "#22C55E",
-    marginTop: 10,
+    marginTop: 12,
     fontWeight: "600",
   },
 });

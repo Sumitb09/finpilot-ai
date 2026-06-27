@@ -1,52 +1,79 @@
 import { useState } from "react";
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
 } from "react-native";
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 import Screen from "../../../components/ui/Screen";
-import { signIn } from "../../../services/auth/auth.service";
-import { router } from "expo-router";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { useLogin } from "../hooks/useLogin";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
-  async function handleLogin() {
-    try { 
-      setLoading(true);
-      const result = await signIn(email.trim(), password);
-      console.log("========== LOGIN RESULT ==========");
-      console.log(result); 
-      console.log(JSON.stringify(result, null, 2)); 
-      if (result.error) { 
-        console.log("LOGIN ERROR:", result.error);  
-        Alert.alert("Login Failed", result.error.message);  
-        return; 
-      }  
-      console.log("LOGIN SUCCESS");  
-      console.log(result.data); 
-      router.replace("/"); 
-    } catch (e) { 
-      console.log("LOGIN EXCEPTION:", e); 
-      Alert.alert("Exception", JSON.stringify(e)); 
-    } finally { 
-      setLoading(false); 
-    } 
-  }
+  const { palette } = useAppTheme();
+
+  const [email, setEmail] = useState("");
+  const login = useLogin();
+
+  const [password, setPassword] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+    async function handleLogin() {
+      try {
+        setLoading(true);
+    
+        await login.mutateAsync({
+          email: email.trim(),
+          password,
+        });
+    
+        router.replace("/(protected)/(tabs)");
+      } catch (error: any) {
+        Alert.alert(
+          t("alerts.error"),
+          error?.message ??
+            t("common.somethingWentWrong")
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
   return (
     <Screen>
-      <Text style={styles.title}>Welcome Back 👋</Text>
+      <Text
+        style={[
+          styles.title,
+          { color: palette.text },
+        ]}
+      >
+        {t("auth.welcomeBack")}
+      </Text>
 
       <TextInput
-        placeholder="Email"
-        placeholderTextColor="#94A3B8"
-        style={styles.input}
+        placeholder={t("auth.email")}
+        placeholderTextColor={
+          palette.subtext
+        }
+        style={[
+          styles.input,
+          {
+            backgroundColor:
+              palette.card,
+            color: palette.text,
+            borderColor:
+              palette.border,
+          },
+        ]}
         autoCapitalize="none"
         keyboardType="email-address"
         value={email}
@@ -54,34 +81,58 @@ export default function LoginScreen() {
       />
 
       <TextInput
-        placeholder="Password"
-        placeholderTextColor="#94A3B8"
+        placeholder={t("auth.password")}
+        placeholderTextColor={
+          palette.subtext
+        }
         secureTextEntry
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor:
+              palette.card,
+            color: palette.text,
+            borderColor:
+              palette.border,
+          },
+        ]}
         value={password}
         onChangeText={setPassword}
       />
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogin}
+        style={[
+          styles.button,
+          {
+            backgroundColor:
+              palette.primary,
+          },
+        ]}
         disabled={loading}
+        onPress={handleLogin}
       >
         <Text style={styles.buttonText}>
-          {loading ? "Signing In..." : "Login"}
+          {loading
+            ? t("auth.signingIn")
+            : t("auth.login")}
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
-        style={{ marginTop: 20 }}
-        onPress={() => router.push("/register")}
+        style={styles.registerButton}
+        onPress={() =>
+          router.push("/register")
+        }
       >
         <Text
-          style={{
-          color: "#60A5FA",
-          textAlign: "center",
-          }}
+          style={[
+            styles.registerText,
+            {
+              color: palette.primary,
+            },
+          ]}
         >
-          Don't have an account? Register
+          {t("auth.noAccount")}
         </Text>
       </TouchableOpacity>
     </Screen>
@@ -90,7 +141,6 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   title: {
-    color: "#fff",
     fontSize: 30,
     fontWeight: "700",
     marginTop: 60,
@@ -98,15 +148,14 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#1E293B",
-    color: "#fff",
     borderRadius: 14,
+    borderWidth: 1,
     padding: 18,
     marginBottom: 16,
+    fontSize: 16,
   },
 
   button: {
-    backgroundColor: "#2563EB",
     padding: 18,
     borderRadius: 14,
     alignItems: "center",
@@ -114,8 +163,18 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#fff",
+    color: "#FFFFFF",
     fontWeight: "700",
     fontSize: 17,
+  },
+
+  registerButton: {
+    marginTop: 20,
+  },
+
+  registerText: {
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });

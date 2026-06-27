@@ -1,19 +1,24 @@
 import { View, Text, StyleSheet } from "react-native";
+import { Profile } from "../../settings/types/profile";
+import { useTranslation } from "react-i18next";
 
-export default function Header() {
+type Props = {
+  profile?: Profile;
+};
+export default function Header({ profile }: Props) {
+  const { t } = useTranslation();
+  console.log("Header Profile:", profile);
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>Good Morning 👋</Text>
-
-      <Text style={styles.name}>Sumit</Text>
+      <Text></Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 10,
   },
 
   greeting: {

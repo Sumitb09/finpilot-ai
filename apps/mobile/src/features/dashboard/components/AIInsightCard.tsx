@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 
 type Props = {
-  insights: string[];
+  insights: string;
 };
 
 export default function AIInsightCard({
@@ -17,17 +17,12 @@ export default function AIInsightCard({
         variant="h3"
         style={styles.title}
       >
-        🤖 Smart Insights
+        🤖 Smart Insight
       </Typography>
 
-      {insights.map((insight, index) => (
-        <Typography
-          key={index}
-          style={styles.insight}
-        >
-          • {insight}
-        </Typography>
-      ))}
+      <Typography style={styles.insight}>
+        {insights}
+      </Typography>
     </Card>
   );
 }
@@ -39,7 +34,6 @@ const styles = StyleSheet.create({
   },
 
   insight: {
-    marginBottom: 12,
     lineHeight: 22,
   },
 });

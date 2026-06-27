@@ -5,6 +5,7 @@ import { imageToBase64 } from "../utils/image";
 
 import { ReceiptResult } from "../types/receipt";
 
+
 export function useReceiptScanner() {
   const [loading, setLoading] =
     useState(false);

@@ -1,25 +1,30 @@
 import React from "react";
 import { router } from "expo-router";
+
 import Screen from "../../../components/ui/Screen";
-import Section from "../../../components/ui/Section";
+
 import Header from "../components/Header";
-import BalanceCard from "../components/BalanceCard";
+import DashboardHeader from "../components/DashboardHeader";
+import HeroBalanceCard from "../components/HeroBalanceCard";
 import BudgetProgressCard from "../components/BudgetProgressCard";
-import MonthlyChart from "../components/MonthlyChart";
-import CategoryBreakdown from "../components/CategoryBreakdown";
-import StatsSection from "../components/StatsSection";
 import QuickActions from "../components/QuickActions";
 import AIInsightCard from "../components/AIInsightCard";
 import FloatingButton from "../components/FloatingButton";
-import TransactionList from "../../transactions/components/TransactionList";
-import { useDashboard } from "../hooks/useDashboard";
 import IncomeExpenseCard from "../components/IncomeExpenseCard";
-import LargestExpenseCard from "../components/LargestExpenseCard";
 import FinancialHealthCard from "../components/FinancialHealthCard";
+import MonthlyChart from "../components/MonthlyChart";
+import CategoryBreakdown from "../components/CategoryBreakdown";
+import LargestExpenseCard from "../components/LargestExpenseCard";
+
+import Section from "../../../components/ui/Section";
+
+import { useDashboard } from "../hooks/useDashboard";
+import DashboardGoalCard from "../../savings/components/DashboardGoalCard";
+import { useTopGoal } from "../../savings/hooks/useTopGoal";
+import EmptyGoals from "../../savings/components/EmptyGoals";
 
 export default function DashboardScreen() {
   const {
-    transactions,
     totals,
     analytics,
     categories,
@@ -29,6 +34,7 @@ export default function DashboardScreen() {
     health,
     isPending,
   } = useDashboard();
+  const topGoal = useTopGoal();
 
   function handleAddExpense() {
     router.push("/(protected)/add-transaction");
@@ -40,29 +46,54 @@ export default function DashboardScreen() {
 
   return (
     <Screen>
-      <Header />
+      <Header profile={profile} />
 
-      <BalanceCard
-        balance={`₹${totals.balance.toLocaleString()}`}
+      <DashboardHeader />
+
+      <HeroBalanceCard
+        balance={totals.balance}
+        income={totals.income}
+        expense={totals.expense}
+        savings={totals.savings}
+        currency={profile?.currency ?? "INR"}
       />
+
+      <QuickActions />
 
       <BudgetProgressCard
         spent={totals.expense}
         budget={profile?.monthly_budget ?? 0}
+        currency={profile?.currency ?? "INR"}
       />
-      <FinancialHealthCard
-        score={health.score}
-        status={health.status}
-        savingsRatio={health.savingsRatio}
-        expenseRatio={health.expenseRatio}
-        budgetUsage={health.budgetUsage}
-        largestExpenseRatio={
-          health.largestExpenseRatio
-        }
-        categoryDiversity={
-          health.categoryDiversity
-        }
+
+
+      {topGoal ? (
+        <Section title="Savings Goal">
+          <DashboardGoalCard
+            goal={topGoal}
+            currency={profile?.currency ?? "INR"}
+          />
+        </Section>
+      ) : (
+        <Section title="Savings Goal">
+          <EmptyGoals
+            onPress={() =>
+              router.push("/(protected)/add-goal")
+            }
+          />
+        </Section>
+      )}
+
+      <AIInsightCard insights={insights} />
+
+      <Section title="Income vs Expense">
+        <IncomeExpenseCard
+          income={totals.income}
+          expense={totals.expense}
+          currency={profile?.currency ?? "INR"}
         />
+      </Section>
+
       <Section title="Monthly Spending">
         <MonthlyChart values={analytics} />
       </Section>
@@ -70,46 +101,22 @@ export default function DashboardScreen() {
       <Section title="Spending by Category">
         <CategoryBreakdown
           categories={categories}
+          currency={profile?.currency ?? "INR"}
         />
       </Section>
-
-      <StatsSection
-        income={totals.income}
-        expense={totals.expense}
-        savings={totals.savings}
-      />
-
-      <QuickActions />
-
-      <Section title="Recent Transactions">
-        <TransactionList
-          data={transactions.slice(0, 5)}
-        />
-      </Section>
-      <Section title="Income vs Expense">
-        <IncomeExpenseCard
-          income={totals.income}
-          expense={totals.expense}
-        />
-      </Section>
-
-      <AIInsightCard
-        insights={insights}
-      />
-
-      <FloatingButton
-        onPress={handleAddExpense}
-      />
 
       {largestExpense && (
         <Section title="Largest Expense">
           <LargestExpenseCard
-            title={largestExpense.title}
-            category={largestExpense.category}
-            amount={largestExpense.amount}
+            transaction={largestExpense}
+            currency={profile?.currency ?? "INR"}
           />
         </Section>
       )}
+
+      <FloatingButton
+        onPress={handleAddExpense}
+      />
     </Screen>
   );
 }

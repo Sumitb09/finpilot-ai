@@ -1,23 +1,37 @@
 import React from "react";
 import {
   Pressable,
-  View,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { router } from "expo-router";
 
 import { useAppTheme } from "../../theme/useAppTheme";
+import PaymentMethodBadge from "./PaymentMethodBadge";
 
 type Props = {
   id: string;
-  emoji: string;
-  title: string;
-  amount: string;
-  income?: boolean;
 
-  category?: string;
-  date?: string;
+  emoji: string;
+
+  title: string;
+
+  amount: string;
+
+  income: boolean;
+
+  category: string;
+
+  date: string;
+
+  paymentMethod?: string;
+
+  hasReceipt?: boolean;
+
+  isVoice?: boolean;
+
+  recurring?: boolean;
 };
 
 export default function TransactionCard({
@@ -25,49 +39,38 @@ export default function TransactionCard({
   emoji,
   title,
   amount,
-  income = false,
-  category = "Transaction",
-  date = "Today",
+  income,
+  category,
+  date,
+  paymentMethod = "Cash",
+  hasReceipt = false,
+  isVoice = false,
+  recurring = false,
 }: Props) {
   const { palette } = useAppTheme();
 
-  function handlePress() {
-    router.push({
-      pathname: "/(protected)/edit-transaction/[id]",
-      params: { id },
-    });
-  }
-
   return (
     <Pressable
-      onPress={handlePress}
-      android_ripple={{
-        color: palette.border,
-      }}
-      style={({ pressed }) => [
-        styles.container,
+      onPress={() =>
+        router.push(
+          `/(protected)/transaction/${id}`
+        )
+      }
+      style={[
+        styles.card,
         {
           backgroundColor: palette.card,
           borderColor: palette.border,
-          transform: [
-            {
-              scale: pressed
-                ? 0.98
-                : 1,
-            },
-          ],
         },
       ]}
     >
       <View style={styles.left}>
         <View
           style={[
-            styles.iconContainer,
+            styles.icon,
             {
               backgroundColor:
-                income
-                  ? "#DCFCE7"
-                  : "#FEE2E2",
+                palette.background,
             },
           ]}
         >
@@ -76,46 +79,64 @@ export default function TransactionCard({
           </Text>
         </View>
 
-        <View style={styles.details}>
+        <View style={styles.info}>
           <Text
+            numberOfLines={1}
             style={[
               styles.title,
               {
                 color: palette.text,
               },
             ]}
-            numberOfLines={1}
           >
             {title}
           </Text>
 
-          <Text
-            style={[
-              styles.subtitle,
-              {
-                color: palette.subtext,
-              },
-            ]}
-          >
-            {date}
-          </Text>
-
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor:
-                  palette.background,
-              },
-            ]}
-          >
+          <View style={styles.metaRow}>
             <Text
-              style={{
-                color: palette.subtext,
-                fontSize: 12,
-              }}
+              style={[
+                styles.category,
+                {
+                  color: palette.subtext,
+                },
+              ]}
             >
               {category}
+            </Text>
+
+            {hasReceipt && (
+              <Text style={styles.badge}>
+                🧾
+              </Text>
+            )}
+
+            {isVoice && (
+              <Text style={styles.badge}>
+                🎤
+              </Text>
+            )}
+
+            {recurring && (
+              <Text style={styles.badge}>
+                🔁
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.bottomRow}>
+            <PaymentMethodBadge
+              method={paymentMethod}
+            />
+
+            <Text
+              style={[
+                styles.date,
+                {
+                  color: palette.subtext,
+                },
+              ]}
+            >
+              {date}
             </Text>
           </View>
         </View>
@@ -138,28 +159,16 @@ export default function TransactionCard({
 }
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
 
-    padding: 18,
-
-    borderRadius: 22,
-
     borderWidth: 1,
+    borderRadius: 20,
 
-    marginBottom: 14,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-
-    elevation: 4,
+    padding: 16,
+    marginBottom: 12,
   },
 
   left: {
@@ -167,10 +176,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  icon: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
 
     justifyContent: "center",
     alignItems: "center",
@@ -179,10 +188,10 @@ const styles = StyleSheet.create({
   },
 
   emoji: {
-    fontSize: 28,
+    fontSize: 26,
   },
 
-  details: {
+  info: {
     flex: 1,
     justifyContent: "center",
   },
@@ -192,22 +201,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  subtitle: {
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
+  },
+
+  category: {
     fontSize: 13,
   },
 
   badge: {
-    alignSelf: "flex-start",
+    marginLeft: 6,
+    fontSize: 13,
+  },
+
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
+  },
+
+  date: {
+    fontSize: 12,
   },
 
   amount: {
-    fontSize: 20,
-    fontWeight: "800",
-    marginLeft: 12,
+    fontWeight: "700",
+    fontSize: 18,
   },
 });

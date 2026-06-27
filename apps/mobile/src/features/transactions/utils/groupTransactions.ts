@@ -1,55 +1,41 @@
-import { isToday, isYesterday } from "date-fns";
-
-import { Transaction } from "../types/transaction";
-
-export interface TransactionGroup {
-  title: string;
-  data: Transaction[];
-}
+import {
+  isToday,
+  isYesterday,
+  format,
+} from "date-fns";
 
 export function groupTransactions(
-  transactions: Transaction[]
-): TransactionGroup[] {
-  const today: Transaction[] = [];
-  const yesterday: Transaction[] = [];
-  const earlier: Transaction[] = [];
+  transactions: any[]
+) {
+  const groups: Record<
+    string,
+    any[]
+  > = {};
 
   transactions.forEach((transaction) => {
     const date = new Date(
       transaction.transaction_date
     );
 
+    let key = "";
+
     if (isToday(date)) {
-      today.push(transaction);
+      key = "Today";
     } else if (isYesterday(date)) {
-      yesterday.push(transaction);
+      key = "Yesterday";
     } else {
-      earlier.push(transaction);
+      key = format(
+        date,
+        "MMMM d, yyyy"
+      );
     }
+
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+
+    groups[key].push(transaction);
   });
-
-  const groups: TransactionGroup[] = [];
-
-  if (today.length) {
-    groups.push({
-      title: "Today",
-      data: today,
-    });
-  }
-
-  if (yesterday.length) {
-    groups.push({
-      title: "Yesterday",
-      data: yesterday,
-    });
-  }
-
-  if (earlier.length) {
-    groups.push({
-      title: "Earlier",
-      data: earlier,
-    });
-  }
 
   return groups;
 }

@@ -1,15 +1,20 @@
+import "../src/i18n";
+
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
-  QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
 
-import { AuthProvider } from "../src/providers/AuthProvider";
 import { ThemeProvider } from "../src/theme/ThemeProvider";
 import { useAppTheme } from "../src/theme/useAppTheme";
 
-const queryClient = new QueryClient();
+import { ToastProvider } from "@/src/components/ui/toast";
+import { BottomSheetProvider } from "@/src/components/ui/bottom-sheet";
+import { AuthProvider } from "../src/providers/AuthProvider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { queryClient } from "@/src/config/reactQuery";
+
 
 function RootNavigator() {
   const { theme } = useAppTheme();
@@ -17,25 +22,40 @@ function RootNavigator() {
   return (
     <>
       <StatusBar
-        style={theme === "light" ? "dark" : "light"}
+        style={
+          theme === "light"
+            ? "dark"
+            : "light"
+        }
       />
 
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(protected)" />
-          </Stack>
-        </AuthProvider>
-      </QueryClientProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(auth)" />
+
+        <Stack.Screen name="(protected)" />
+      </Stack>
     </>
   );
 }
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootNavigator />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <BottomSheetProvider>
+                <RootNavigator />
+              </BottomSheetProvider>
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

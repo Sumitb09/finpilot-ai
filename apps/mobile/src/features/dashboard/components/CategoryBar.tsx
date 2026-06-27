@@ -6,12 +6,14 @@ import {
 } from "react-native";
 
 import { useAppTheme } from "../../../theme/useAppTheme";
+import { formatCurrency } from "../../../utils/currency";
 
 type Props = {
   icon: string;
   name: string;
   amount: number;
   percentage: number;
+  currency: string;
 };
 
 export default function CategoryBar({
@@ -19,13 +21,16 @@ export default function CategoryBar({
   name,
   amount,
   percentage,
+  currency,
 }: Props) {
   const { palette } = useAppTheme();
 
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Text style={styles.icon}>{icon}</Text>
+        <Text style={styles.icon}>
+          {icon}
+        </Text>
 
         <Text
           style={[
@@ -42,7 +47,10 @@ export default function CategoryBar({
             { color: palette.subtext },
           ]}
         >
-          ₹{amount.toLocaleString()}
+          {formatCurrency(
+            amount,
+            currency
+          )}
         </Text>
       </View>
 
@@ -50,7 +58,8 @@ export default function CategoryBar({
         style={[
           styles.track,
           {
-            backgroundColor: palette.border,
+            backgroundColor:
+              palette.border,
           },
         ]}
       >
@@ -59,7 +68,8 @@ export default function CategoryBar({
             styles.progress,
             {
               width: `${percentage}%`,
-              backgroundColor: palette.primary,
+              backgroundColor:
+                palette.primary,
             },
           ]}
         />

@@ -1,19 +1,26 @@
 import React, { useEffect } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import Markdown from "react-native-markdown-display";
+
 import Screen from "../../../components/ui/Screen";
 import Typography from "../../../components/ui/Typography";
 import Button from "../../../components/ui/Button";
+
 import { useDashboard } from "../../dashboard/hooks/useDashboard";
 import { useReport } from "../hooks/useReport";
-import { useAppTheme } from "../../../theme/useAppTheme";
 import { exportReportAsPDF } from "../services/pdf.service";
+
+import { useAppTheme } from "../../../theme/useAppTheme";
 
 export default function ReportScreen() {
   const { palette } = useAppTheme();
 
   const {
-    transactions,
+    transactions = [],
     profile,
   } = useDashboard();
 
@@ -26,9 +33,10 @@ export default function ReportScreen() {
   useEffect(() => {
     generate(
       transactions,
-      profile?.monthly_budget ?? 0
+      profile?.monthly_budget ?? 0,
+      profile?.currency ?? "INR"
     );
-  }, []);
+  }, [transactions, profile]);
 
   return (
     <Screen>
@@ -57,20 +65,17 @@ export default function ReportScreen() {
                   fontSize: 16,
                   lineHeight: 24,
                 },
-
                 heading1: {
                   color: palette.primary,
                   fontSize: 26,
                   marginBottom: 12,
                 },
-
                 heading2: {
                   color: palette.primary,
                   fontSize: 20,
                   marginTop: 18,
                   marginBottom: 10,
                 },
-
                 bullet_list: {
                   color: palette.text,
                 },
@@ -85,15 +90,15 @@ export default function ReportScreen() {
             onPress={() =>
               generate(
                 transactions,
-                profile?.monthly_budget ?? 0
+                profile?.monthly_budget ?? 0,
+                profile?.currency ?? "INR"
               )
             }
           />
+
           <Button
             title="📄 Export PDF"
-            onPress={() =>
-              exportReportAsPDF(report)
-            }
+            onPress={() => exportReportAsPDF(report)}
           />
         </>
       )}
