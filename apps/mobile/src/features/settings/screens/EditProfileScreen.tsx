@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
+import { Alert, StyleSheet, Text, View, } from "react-native";
 import Screen from "../../../components/ui/Screen";
 import Button from "../../../components/ui/Button";
-
 import AvatarCard from "../components/AvatarCard";
 import ProfileInput from "../components/ProfileInput";
 import CurrencyPicker from "../components/CurrencyPicker";
@@ -33,7 +26,7 @@ export default function EditProfileScreen() {
   const [email, setEmail] = useState("");
 
   const [currency, setCurrency] =
-    useState("INR");
+    useState<string>("INR");
 
   const [income, setIncome] =
     useState("");

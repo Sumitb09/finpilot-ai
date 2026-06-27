@@ -1,25 +1,28 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import StatCard from "../../../components/ui/StatCard";
+import StatCard from "../../../components/common/StatCard";
+import { formatCurrency } from "../../../utils/currency";
 
 type Props = {
   income: number;
   expense: number;
   savings: number;
+  currency: string;
 };
 
 export default function StatsSection({
   income,
   expense,
   savings,
+  currency,
 }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <StatCard
           title="Income"
-          value={`₹${income.toLocaleString()}`}
+          value={formatCurrency(income, currency)}
           color="#22C55E"
         />
       </View>
@@ -27,7 +30,7 @@ export default function StatsSection({
       <View style={styles.card}>
         <StatCard
           title="Expense"
-          value={`₹${expense.toLocaleString()}`}
+          value={formatCurrency(expense, currency)}
           color="#EF4444"
         />
       </View>
@@ -35,7 +38,7 @@ export default function StatsSection({
       <View style={styles.card}>
         <StatCard
           title="Savings"
-          value={`₹${savings.toLocaleString()}`}
+          value={formatCurrency(savings, currency)}
           color="#3B82F6"
         />
       </View>

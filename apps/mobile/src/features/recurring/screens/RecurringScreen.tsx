@@ -13,12 +13,14 @@ import { router } from "expo-router";
 
 import { useRecurring } from "../hooks/useRecurring";
 import RecurringCard from "../components/RecurringCard";
+import { useProfile } from "../../settings/hooks/useProfile";
 
 export default function RecurringScreen() {
   const {
     data = [],
     isPending,
   } = useRecurring();
+  const { data: profile } = useProfile();
 
   if (isPending) {
     return (
@@ -41,7 +43,9 @@ export default function RecurringScreen() {
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <RecurringCard recurring={item} />
+          <RecurringCard 
+            recurring={item}
+            currency={profile?.currency ?? "INR"} />
         )}
         ListEmptyComponent={
           <Typography
@@ -54,10 +58,7 @@ export default function RecurringScreen() {
 
       <Button
         title="+ Add Recurring"
-        onPress={() =>
-          router.push(
-            "/(protected)/add-recurring"
-          )
+        onPress={() => {}
         }
       />
     </Screen>

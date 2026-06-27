@@ -1,34 +1,21 @@
 import React, { useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-import {
-  CameraView,
-  useCameraPermissions,
-} from "expo-camera";
+import { View, StyleSheet, ActivityIndicator, Alert, } from "react-native";
+import { CameraView, useCameraPermissions, } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-
 import Button from "../../../components/ui/Button";
 import Screen from "../../../components/ui/Screen";
 import Typography from "../../../components/ui/Typography";
-
+import { useTranslation } from "react-i18next";
 import { useReceiptScanner } from "../hooks/useReceiptScanner";
+import { useReceiptStore } from "../store";
 
 export default function ReceiptScannerScreen() {
-  const cameraRef =
-    useRef<CameraView>(null);
-
-  const [permission, requestPermission] =
-    useCameraPermissions();
-
-  const {
-    loading,
-    scanReceipt,
-  } = useReceiptScanner();
+  const cameraRef = useRef<CameraView>(null);
+  const { t } = useTranslation();
+  const [permission, requestPermission] = useCameraPermissions();
+  const { loading, scanReceipt, } = useReceiptScanner();
+  const { setReceipt } = useReceiptStore();
 
   if (!permission) {
     return <Screen />;
@@ -38,7 +25,7 @@ export default function ReceiptScannerScreen() {
     return (
       <Screen>
         <Button
-          title="Allow Camera"
+          title={t("receipt.allowCamera")}
           onPress={requestPermission}
         />
       </Screen>
@@ -56,20 +43,18 @@ export default function ReceiptScannerScreen() {
 
       const receipt =
         await scanReceipt(photo.uri);
-
-      router.push({
-        pathname:
-          "/(protected)/receipt-preview",
-        params: {
-          receipt: JSON.stringify(receipt),
-        },
+      setReceipt({
+        ...receipt,
+        image: photo.uri,
       });
+
+      router.push("/(protected)/receipt-preview",);
     } catch (error) {
       console.error(error);
 
       Alert.alert(
-        "Error",
-        "Failed to scan receipt."
+        t("common.error"),
+        t("receipt.scanFailed")
       );
     }
   }
@@ -84,18 +69,15 @@ export default function ReceiptScannerScreen() {
 
     if (result.canceled) return;
 
+    const uri = result.assets[0].uri;
     const receipt =
-      await scanReceipt(
-        result.assets[0].uri
-      );
-
-    router.push({
-      pathname:
-        "/(protected)/receipt-preview",
-      params: {
-        receipt: JSON.stringify(receipt),
-      },
+      await scanReceipt(uri);
+    setReceipt({
+      ...receipt,
+      image: uri,
     });
+
+    router.push("/(protected)/receipt-preview",);
   }
 
   return (
@@ -112,22 +94,20 @@ export default function ReceiptScannerScreen() {
             color="#fff"
           />
 
-          <Typography
-            style={styles.text}
-          >
-            🤖 AI is reading your receipt...
+          <Typography style={styles.text}>
+            {t("receipt.aiReading")}
           </Typography>
         </View>
       )}
 
       <View style={styles.bottom}>
         <Button
-          title="📷 Capture"
+          title={t("receipt.capture")}
           onPress={handleCapture}
         />
 
         <Button
-          title="🖼 Gallery"
+          title={t("receipt.gallery")}
           onPress={handleGallery}
         />
       </View>

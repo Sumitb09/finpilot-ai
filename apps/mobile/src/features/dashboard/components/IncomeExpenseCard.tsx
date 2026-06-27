@@ -1,18 +1,21 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 import { useAppTheme } from "../../../theme/useAppTheme";
+import { formatCurrency } from "../../../utils/currency";
 
 type Props = {
   income: number;
   expense: number;
+  currency: string;
 };
 
 export default function IncomeExpenseCard({
   income,
   expense,
+  currency,
 }: Props) {
   const { palette } = useAppTheme();
 
@@ -40,6 +43,7 @@ export default function IncomeExpenseCard({
         value={income}
         percent={incomePercent}
         color={palette.success}
+        currency={currency}
       />
 
       <StatBlock
@@ -47,6 +51,7 @@ export default function IncomeExpenseCard({
         value={expense}
         percent={expensePercent}
         color={palette.danger}
+        currency={currency}
       />
 
       <View
@@ -69,7 +74,9 @@ export default function IncomeExpenseCard({
             fontWeight: "700",
           }}
         >
-          {savings >= 0 ? "💰 Savings" : "⚠️ Deficit"}
+          {savings >= 0
+            ? "💰 Savings"
+            : "⚠️ Deficit"}
         </Typography>
 
         <Typography
@@ -82,7 +89,10 @@ export default function IncomeExpenseCard({
                 : palette.danger,
           }}
         >
-          ₹{Math.abs(savings).toLocaleString()}
+          {formatCurrency(
+            Math.abs(savings),
+            currency
+          )}
         </Typography>
       </View>
     </Card>
@@ -94,6 +104,7 @@ type StatProps = {
   value: number;
   percent: number;
   color: string;
+  currency: string;
 };
 
 function StatBlock({
@@ -101,6 +112,7 @@ function StatBlock({
   value,
   percent,
   color,
+  currency,
 }: StatProps) {
   const { palette } = useAppTheme();
 
@@ -112,7 +124,10 @@ function StatBlock({
         <Typography
           style={{ fontWeight: "700" }}
         >
-          ₹{value.toLocaleString()}
+          {formatCurrency(
+            value,
+            currency
+          )}
         </Typography>
       </View>
 

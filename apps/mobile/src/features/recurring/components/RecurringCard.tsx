@@ -4,17 +4,20 @@ import {
   StyleSheet,
 } from "react-native";
 
-import Card from "../../../components/ui/Card";
+import Card from "../../../components/common/Card";
 import Typography from "../../../components/ui/Typography";
 
 import { RecurringTransaction } from "../types/recurring";
+import { formatCurrency } from "../../../utils/currency";
 
 type Props = {
   recurring: RecurringTransaction;
+  currency: string;
 };
 
 export default function RecurringCard({
   recurring,
+  currency,
 }: Props) {
   return (
     <Card>
@@ -23,9 +26,10 @@ export default function RecurringCard({
       </Typography>
 
       <Typography>
-        ₹{Number(
-          recurring.amount
-        ).toLocaleString()}
+        {formatCurrency(
+          Number(recurring.amount),
+          currency
+        )}
       </Typography>
 
       <Typography>
@@ -33,8 +37,7 @@ export default function RecurringCard({
       </Typography>
 
       <Typography>
-        Next:
-        {" "}
+        Next:{" "}
         {new Date(
           recurring.next_date
         ).toLocaleDateString()}
@@ -48,3 +51,5 @@ export default function RecurringCard({
     </Card>
   );
 }
+
+const styles = StyleSheet.create({});

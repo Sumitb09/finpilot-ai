@@ -1,0 +1,93 @@
+export const MERCHANT_DICTIONARY = {
+    Bills: [
+      "electricity",
+      "water",
+      "gas",
+      "internet",
+      "wifi",
+      "phone",
+      "mobile",
+      "recharge",
+    ],
+  
+    Food: [
+      "zomato",
+      "swiggy",
+      "dominos",
+      "pizza",
+      "burger",
+      "restaurant",
+      "kfc",
+      "mcdonald",
+      "subway",
+      "starbucks",
+      "coffee",
+      "tea",
+    ],
+  
+    Shopping: [
+      "amazon",
+      "flipkart",
+      "myntra",
+      "ajio",
+      "nike",
+      "adidas",
+      "shirt",
+      "shoe",
+      "soap",
+      "shampoo",
+    ],
+  
+    Transport: [
+      "uber",
+      "ola",
+      "petrol",
+      "diesel",
+      "fuel",
+      "metro",
+      "bus",
+      "train",
+      "flight",
+      "airport",
+    ],
+  
+    Entertainment: [
+      "netflix",
+      "spotify",
+      "youtube",
+      "prime",
+      "hotstar",
+      "steam",
+      "playstation",
+      "xbox",
+      "movie",
+    ],
+  
+    Health: [
+      "medicine",
+      "hospital",
+      "doctor",
+      "clinic",
+      "apollo",
+      "pharmacy",
+    ],
+  
+    Investment: [
+      "stock",
+      "sip",
+      "mutual",
+      "crypto",
+      "bitcoin",
+      "gold",
+      "zerodha",
+      "groww",
+    ],
+  
+    Salary: [
+      "salary",
+      "bonus",
+      "income",
+      "freelance",
+      "stipend",
+    ],
+  };

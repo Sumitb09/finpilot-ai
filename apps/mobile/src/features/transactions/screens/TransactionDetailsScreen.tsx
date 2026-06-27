@@ -1,125 +1,143 @@
 import React from "react";
 import {
   Alert,
+  ScrollView,
   StyleSheet,
-  Text,
 } from "react-native";
-
 import {
   router,
   useLocalSearchParams,
 } from "expo-router";
 
 import Screen from "../../../components/ui/Screen";
-import Button from "../../../components/ui/Button";
 
-import DetailRow from "../components/DetailRow";
+import TransactionHero from "../components/TransactionHero";
+import MerchantInfoCard from "../components/MerchantInfoCard";
+import PaymentInfoCard from "../components/PaymentInfoCard";
+import ReceiptCard from "../components/ReceiptCard";
+import TagsCard from "../components/TagsCard";
+import NoteCard from "../components/NoteCard";
+import TransactionActions from "../components/TransactionActions";
 
 import { useTransaction } from "../hooks/useTransaction";
-import { useDeleteTransaction } from "../hooks/useDeleteTransaction";
+
 
 export default function TransactionDetailsScreen() {
   const { id } = useLocalSearchParams();
 
-  const {
-    data: transaction,
-    isPending,
-  } = useTransaction(id as string);
+  const { data: transaction } =
+    useTransaction(id as string);
 
-  const deleteMutation =
-    useDeleteTransaction();
-
-  if (isPending || !transaction) {
+  if (!transaction) {
     return <Screen />;
-  }
-
-  function handleDelete() {
-    Alert.alert(
-      "Delete Transaction",
-      "This action cannot be undone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await deleteMutation.mutateAsync(
-              transaction.id
-            );
-
-            router.back();
-          },
-        },
-      ]
-    );
   }
 
   return (
     <Screen>
-      <Text style={styles.title}>
-        {transaction.categories?.icon ?? "💳"}{" "}
-        {transaction.title}
-      </Text>
-
-      <DetailRow
-        label="Amount"
-        value={`₹${Number(
-          transaction.amount
-        ).toLocaleString()}`}
-      />
-
-      <DetailRow
-        label="Type"
-        value={transaction.type}
-      />
-
-      <DetailRow
-        label="Category"
-        value={
-          transaction.categories?.name ??
-          "Other"
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={
+          styles.container
         }
-      />
+      >
+        <TransactionHero
+          icon={
+            transaction.categories?.icon ??
+            "💳"
+          }
+          title={transaction.title}
+          amount={Number(
+            transaction.amount
+          )}
+          income={
+            transaction.type === "income"
+          }
+          category={
+            transaction.categories?.name ??
+            "General"
+          }
+          date={new Date(
+            transaction.transaction_date
+          ).toLocaleString()}
+        />
 
-      <DetailRow
-        label="Date"
-        value={transaction.transaction_date}
-      />
+        <MerchantInfoCard
+          merchant={
+            transaction.merchant ??
+            transaction.title
+          }
+          category={
+            transaction.categories?.name ??
+            "General"
+          }
+        />
 
-      <DetailRow
-        label="Note"
-        value={
-          transaction.note || "No notes"
-        }
-      />
+        <PaymentInfoCard
+          paymentMethod={
+            transaction.payment_method
+          }
+          upiId={transaction.upi_id}
+          reference={
+            transaction.transaction_reference
+          }
+        />
 
-      <Button
-        title="Edit Transaction"
-        onPress={() =>
-          router.push(
-            `/(protected)/edit-transaction/${transaction.id}`
-          )
-        }
-      />
+<ReceiptCard
+  receiptImage={transaction.receipt_image}
+  onPress={() =>
+    router.push({
+      pathname:
+        "/(protected)/receipt-viewer",
+      params: {
+        image:
+          transaction.receipt_image!,
+      },
+    })
+  }
+/>
 
-      <Text style={{ height: 12 }} />
+        <TagsCard
+          tags={transaction.tags}
+        />
 
-      <Button
-        title="Delete Transaction"
-        onPress={handleDelete}
-      />
+        <NoteCard
+          note={transaction.note}
+        />
+
+        <TransactionActions
+          onEdit={() =>
+            router.push(
+              `/(protected)/edit-transaction/${transaction.id}`
+            )
+          }
+          onDelete={() =>
+            Alert.alert(
+              "Delete Transaction",
+              "Are you sure you want to delete this transaction?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => {
+                    // TODO:
+                    // Delete transaction mutation
+                  },
+                },
+              ]
+            )
+          }
+        />
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 32,
+  container: {
+    paddingBottom: 40,
   },
 });

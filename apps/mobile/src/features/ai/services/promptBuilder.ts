@@ -1,5 +1,4 @@
 import { ChatMessage } from "../types/chat";
-
 import { Transaction } from "../../transactions/types/transaction";
 
 import {
@@ -7,13 +6,17 @@ import {
   getLargestExpense,
   getAverageDailySpend,
   getMonthlyAnalytics,
-} from "../../dashboard/services/analytics.service";
+  MonthlyAnalytics,
+} from "../../analytics/services/analytics.service";
+
+import { formatCurrency } from "../../../utils/currency";
 
 export function buildPrompt(
   question: string,
   history: ChatMessage[],
   transactions: Transaction[],
-  monthlyBudget = 0
+  monthlyBudget = 0,
+  currency = "INR"
 ) {
   const summary =
     getCurrentMonthSummary(transactions);
@@ -52,22 +55,44 @@ ${historyText}
 
 Financial Summary
 
-Income: ₹${summary.income}
+Income: ${formatCurrency(
+  summary.income,
+  currency
+)}
 
-Expense: ₹${summary.expense}
+Expense: ${formatCurrency(
+  summary.expense,
+  currency
+)}
 
-Savings: ₹${summary.savings}
+Savings: ${formatCurrency(
+  summary.savings,
+  currency
+)}
 
-Balance: ₹${summary.balance}
+Balance: ${formatCurrency(
+  summary.balance,
+  currency
+)}
 
-Monthly Budget: ₹${monthlyBudget}
+Monthly Budget: ${formatCurrency(
+  monthlyBudget,
+  currency
+)}
 
-Average Daily Spend: ₹${average.amount}
+Average Daily Spend: ${formatCurrency(
+  average.amount,
+  currency
+)}
 
-Largest Expense:
+Largest Expense
+
 ${largest?.title ?? "None"}
 
-Amount: ₹${largest?.amount ?? 0}
+Amount: ${formatCurrency(
+  largest?.amount ?? 0,
+  currency
+)}
 
 Category:
 ${largest?.category ?? "Unknown"}
@@ -76,8 +101,17 @@ Monthly Analytics
 
 ${monthly
   .map(
-    (item) =>
-      `${item.month}: Income ₹${item.income}, Expense ₹${item.expense}, Savings ₹${item.savings}`
+    (item: MonthlyAnalytics) =>
+      `${item.month}: Income ${formatCurrency(
+        item.income,
+        currency
+      )}, Expense ${formatCurrency(
+        item.expense,
+        currency
+      )}, Savings ${formatCurrency(
+        item.savings,
+        currency
+      )}`
   )
   .join("\n")}
 

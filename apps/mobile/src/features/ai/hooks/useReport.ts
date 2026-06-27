@@ -10,7 +10,8 @@ export function useReport() {
 
   async function generate(
     transactions: Transaction[],
-    budget: number
+    budget: number,
+    currency: string
   ) {
     setLoading(true);
 
@@ -18,7 +19,8 @@ export function useReport() {
       const result =
         await generateMonthlyReport(
           transactions,
-          budget
+          budget,
+          currency
         );
 
       setReport(result);

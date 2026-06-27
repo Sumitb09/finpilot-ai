@@ -1,13 +1,14 @@
-import { askGemini } from "./ai.service";
-import { buildPrompt } from "./promptBuilder";
-
 import { Transaction } from "../../transactions/types/transaction";
 import { ChatMessage } from "../types/chat";
 
+import { askGemini } from "./ai.service";
+import { buildPrompt } from "./promptBuilder";
+
 export async function generateMonthlyReport(
   transactions: Transaction[],
-  monthlyBudget: number
-) {
+  monthlyBudget: number = 0,
+  currency: string = "INR"
+): Promise<string> {
   const history: ChatMessage[] = [];
 
   const prompt = `
@@ -15,7 +16,8 @@ ${buildPrompt(
   "Generate a complete monthly financial report.",
   history,
   transactions,
-  monthlyBudget
+  monthlyBudget,
+  currency
 )}
 
 Generate a professional financial report in Markdown.
@@ -52,5 +54,10 @@ Rules:
 - Keep under 500 words.
 `;
 
-  return askGemini(prompt);
+  return await askGemini({
+    prompt,
+    history,
+    transactions,
+    monthlyBudget,
+  });
 }

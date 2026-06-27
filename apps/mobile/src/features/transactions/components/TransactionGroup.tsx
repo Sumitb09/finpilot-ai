@@ -1,41 +1,80 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
 
-import Typography from "../../../components/ui/Typography";
-import TransactionList from "./TransactionList";
-
-import { TransactionGroup as Group } from "../utils/groupTransactions";
+import { useAppTheme } from "../../../theme/useAppTheme";
 
 type Props = {
-  group: Group;
+  title: string;
+  total: number;
+  currency: string;
+  children: React.ReactNode;
 };
 
 export default function TransactionGroup({
-  group,
+  title,
+  total,
+  currency,
+  children,
 }: Props) {
+  const { palette } = useAppTheme();
+
   return (
     <View style={styles.container}>
-      <Typography
-        variant="h3"
-        style={styles.title}
-      >
-        {group.title}
-      </Typography>
+      <View style={styles.header}>
+        <Text
+          style={[
+            styles.title,
+            { color: palette.text },
+          ]}
+        >
+          {title}
+        </Text>
 
-      <TransactionList
-        data={group.data}
-      />
+        <Text
+          style={[
+            styles.total,
+            {
+              color:
+                total >= 0
+                  ? palette.success
+                  : palette.danger,
+            },
+          ]}
+        >
+          {currency}
+          {Math.abs(total).toFixed(2)}
+        </Text>
+      </View>
+
+      {children}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 28,
+    marginBottom: 26,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
 
   title: {
-    marginBottom: 14,
+    fontSize: 20,
+    fontWeight: "700",
+  },
+
+  total: {
+    fontSize: 15,
     fontWeight: "700",
   },
 });

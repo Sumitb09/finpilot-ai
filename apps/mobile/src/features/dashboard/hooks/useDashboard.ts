@@ -1,10 +1,18 @@
 import { useMemo } from "react";
+
 import { useTransactions } from "../../transactions/hooks/useTransactions";
 import { useProfile } from "../../settings/hooks/useProfile";
-import { getCategoryBreakdown, } from "../services/dashboard.service";
-import { getMonthlyAnalytics, getLargestExpense } from "../services/analytics.service";
-import { generateInsights } from "../services/insight.service";
-import { calculateFinancialHealth } from "../../analytics/services/healthScore.service";
+
+import { getCategoryBreakdown } from "../services/dashboard.service";
+
+import {
+  getMonthlyAnalytics,
+  getLargestExpense,
+} from "../../analytics/services/analytics.service";
+
+import { calculateFinancialHealth } from "../../analytics/services/health-score.service";
+
+import { generateInsight } from "../utils/generateInsight";
 
 export function useDashboard() {
   const {
@@ -21,19 +29,88 @@ export function useDashboard() {
     let income = 0;
     let expense = 0;
 
+    let currentIncome = 0;
+    let currentExpense = 0;
+
+    let previousIncome = 0;
+    let previousExpense = 0;
+
+    const now = new Date();
+
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const previousMonth =
+      currentMonth === 0 ? 11 : currentMonth - 1;
+
+    const previousYear =
+      currentMonth === 0
+        ? currentYear - 1
+        : currentYear;
+
     data.forEach((transaction) => {
+      const amount = Number(transaction.amount);
+
       if (transaction.type === "income") {
-        income += Number(transaction.amount);
+        income += amount;
       } else {
-        expense += Number(transaction.amount);
+        expense += amount;
+      }
+
+      const transactionDate = new Date(
+        transaction.created_at
+      );
+
+      const month = transactionDate.getMonth();
+      const year = transactionDate.getFullYear();
+
+      if (
+        month === currentMonth &&
+        year === currentYear
+      ) {
+        if (transaction.type === "income") {
+          currentIncome += amount;
+        } else {
+          currentExpense += amount;
+        }
+      }
+
+      if (
+        month === previousMonth &&
+        year === previousYear
+      ) {
+        if (transaction.type === "income") {
+          previousIncome += amount;
+        } else {
+          previousExpense += amount;
+        }
       }
     });
+
+    const balance = income - expense;
+    const savings = balance;
+
+    const currentBalance =
+      currentIncome - currentExpense;
+
+    const previousBalance =
+      previousIncome - previousExpense;
+
+    let balanceChange: number | null = null;
+
+    if (previousBalance !== 0) {
+      balanceChange =
+        ((currentBalance - previousBalance) /
+          Math.abs(previousBalance)) *
+        100;
+    }
 
     return {
       income,
       expense,
-      balance: income - expense,
-      savings: income - expense,
+      balance,
+      savings,
+      balanceChange,
     };
   }, [data]);
 
@@ -54,11 +131,11 @@ export function useDashboard() {
 
   const insights = useMemo(
     () =>
-      generateInsights(
-        data,
-        profile?.monthly_budget ?? 0
+      generateInsight(
+        totals,
+        profile
       ),
-    [data, profile]
+    [totals, profile]
   );
 
   const health = useMemo(
@@ -69,8 +146,6 @@ export function useDashboard() {
       ),
     [data, profile]
   );
-  
-  console.log(health);
 
   return {
     transactions: data,
